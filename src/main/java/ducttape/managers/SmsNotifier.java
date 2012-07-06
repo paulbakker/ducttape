@@ -3,10 +3,13 @@ package ducttape.managers;
 import ducttape.entities.WebOrder;
 import org.jboss.seam.jms.TopicBuilder;
 
+import javax.annotation.Resource;
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.jms.Topic;
+
 import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
@@ -17,11 +20,12 @@ import java.util.concurrent.TimeUnit;
 @Stateless
 public class SmsNotifier {
     @Inject TopicBuilder topicBuilder;
-
+    @Resource(mappedName="topic/orders") Topic ordersTopic;
+    
     public
     @Asynchronous
     void sms(@Observes @OrderPlaced WebOrder webOrder) {
-        topicBuilder.destination("topic/orders").sendString("Order for " + webOrder.getCustomer().getName());
+        topicBuilder.destination(ordersTopic).sendString("Order for " + webOrder.getCustomer().getName());
 
     }
 }
